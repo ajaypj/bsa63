@@ -74,7 +74,7 @@ export function HashPage({ results, setResults }: Props) {
       {results.length > 0 && (
         <>
           <div className="card space-y-3">
-            <div className="font-medium">Verify hash</div>
+            <div className="text-lg font-semibold">Verify hash</div>
             <input
               className="field font-mono"
               placeholder="Paste the expected SHA-256 hash"
@@ -87,9 +87,9 @@ export function HashPage({ results, setResults }: Props) {
             <button className="btn-primary" disabled={!expected.trim()} onClick={verify}>
               Verify
             </button>
-            {verdict && <p className={`text-sm font-medium ${verdict.ok ? 'text-emerald-700' : 'text-red-700'}`}>{verdict.text}</p>}
+            {verdict && <p className={`text-base font-medium ${verdict.ok ? 'text-emerald-700' : 'text-red-700'}`}>{verdict.text}</p>}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-3">
             <button
               className="btn-primary"
               onClick={async () => download(await buildHashReportPdf(results), 'hash-report.pdf', 'application/pdf')}

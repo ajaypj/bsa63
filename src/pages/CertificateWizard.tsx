@@ -12,7 +12,7 @@ const input = 'field mt-1'
 
 function Text({ label, name, register, error }: { label: string; name: string; register: UseFormRegister<PartA>; error?: string }) {
   return (
-    <label className="block text-sm">
+    <label className="block text-base">
       {label}
       <input className={input} {...register(name as never)} />
       {error && <span className="text-red-700">{error}</span>}
@@ -22,7 +22,7 @@ function Text({ label, name, register, error }: { label: string; name: string; r
 
 function Checks({ label, name, options, register, error }: { label: string; name: string; options: readonly string[]; register: UseFormRegister<PartA>; error?: string }) {
   return (
-    <fieldset className="text-sm">
+    <fieldset className="text-base">
       <legend className="font-medium">{label}</legend>
       <div className="flex flex-wrap gap-3">
         {options.map((o) => (
@@ -71,7 +71,7 @@ export function CertificateWizard({ files }: { files: FileHash[] }) {
       <p className="text-sm text-slate-600">{files.length} file(s) will be listed with their hashes. Part B is printed blank for the expert to complete.</p>
       <div className="grid gap-3 sm:grid-cols-2">
         {(['court', 'caseNumber', 'parties', 'exhibitNumber'] as const).map((k) => (
-          <label key={k} className="block text-sm">
+          <label key={k} className="block text-base">
             {k}
             <input className={input} value={caseDetails[k]} onChange={(e) => setCaseDetails({ ...caseDetails, [k]: e.target.value })} />
           </label>
