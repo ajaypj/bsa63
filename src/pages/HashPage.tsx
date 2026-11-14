@@ -60,7 +60,7 @@ export function HashPage({ results, setResults }: Props) {
       <FileDrop onFiles={run} />
       {progress !== null && (
         <div className="card flex items-center gap-3">
-          <progress className="h-2 flex-1 accent-indigo-600" value={progress} max={1} />
+          <progress className="h-2 flex-1 accent-brand-600" value={progress} max={1} />
           <button className="btn-ghost" onClick={cancel}>
             Cancel
           </button>

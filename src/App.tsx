@@ -19,7 +19,7 @@ export default function App() {
             <img src="/logo.svg" alt="" className="h-11 w-11" />
             <div className="leading-tight">
               <div className="text-xl font-semibold tracking-tight">BSA63</div>
-              <div className="text-sm text-slate-500">63BSA (Old 65B) Certificate</div>
+              <div className="text-sm text-slate-500">63BSA (Previously 65B) Certificate</div>
             </div>
           </div>
           <span className="hidden rounded-full bg-emerald-50 px-4 py-1.5 text-sm text-emerald-700 sm:inline">100% Private and Secure</span>

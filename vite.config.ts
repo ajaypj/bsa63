@@ -10,10 +10,10 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: '63BSA (Old 65B) Certificate Generator',
+        name: '63BSA (Previously 65B) Certificate Generator',
         short_name: 'BSA63',
         display: 'standalone',
-        theme_color: '#1e293b',
+        theme_color: '#1d4bc4',
         background_color: '#ffffff',
       },
     }),
