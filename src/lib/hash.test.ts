@@ -1,25 +1,15 @@
-import { createMD5, createSHA1, createSHA256 } from 'hash-wasm'
+import { createSHA256 } from 'hash-wasm'
 import { describe, expect, it } from 'vitest'
 import { formatDateIST, formatTimeIST } from './time'
 
 const VECTORS = {
-  '': {
-    sha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-    sha1: 'da39a3ee5e6b4b0d3255bfef95601890afd80709',
-    md5: 'd41d8cd98f00b204e9800998ecf8427e',
-  },
-  abc: {
-    sha256: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
-    sha1: 'a9993e364706816aba3e25717850c26c9cd0d89d',
-    md5: '900150983cd24fb0d6963f7d28e17f72',
-  },
+  '': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+  abc: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
 }
 
-describe('hash vectors', () => {
-  it.each(Object.entries(VECTORS))('matches published values for %j', async (input, want) => {
-    expect(await (await createSHA256()).init().update(input).digest('hex')).toBe(want.sha256)
-    expect(await (await createSHA1()).init().update(input).digest('hex')).toBe(want.sha1)
-    expect(await (await createMD5()).init().update(input).digest('hex')).toBe(want.md5)
+describe('sha256 vectors', () => {
+  it.each(Object.entries(VECTORS))('matches published value for %j', async (input, want) => {
+    expect(await (await createSHA256()).init().update(input).digest('hex')).toBe(want)
   })
 
   it('handles one million a (chunked)', async () => {

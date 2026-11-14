@@ -8,7 +8,7 @@ import { download } from '../lib/download'
 import type { FileHash } from '../lib/hashFile'
 import { formatDateIST, formatTimeIST } from '../lib/time'
 
-const input = 'w-full rounded border p-2 text-sm'
+const input = 'field mt-1'
 
 function Text({ label, name, register, error }: { label: string; name: string; register: UseFormRegister<PartA>; error?: string }) {
   return (
@@ -67,9 +67,9 @@ export function CertificateWizard({ files }: { files: FileHash[] }) {
   })
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      <p className="text-sm">{files.length} file(s) will be listed with their hashes. Part B is printed blank for the expert to complete.</p>
-      <div className="grid gap-2 sm:grid-cols-2">
+    <form onSubmit={submit} className="card space-y-4">
+      <p className="text-sm text-slate-600">{files.length} file(s) will be listed with their hashes. Part B is printed blank for the expert to complete.</p>
+      <div className="grid gap-3 sm:grid-cols-2">
         {(['court', 'caseNumber', 'parties', 'exhibitNumber'] as const).map((k) => (
           <label key={k} className="block text-sm">
             {k}
@@ -98,7 +98,7 @@ export function CertificateWizard({ files }: { files: FileHash[] }) {
       <Checks label="The device or source is (by me)" name="ownership" options={OWNERSHIP} register={register} error={errors.ownership?.message} />
       <Checks label="Hash algorithm" name="algorithms" options={ALGORITHMS} register={register} error={errors.algorithms?.message} />
       <Text label="Other algorithm" name="otherAlgorithm" register={register} error={errors.otherAlgorithm?.message} />
-      <button className="rounded bg-slate-800 px-4 py-2 text-white">Download certificate PDF</button>
+      <button className="btn-primary">Download certificate PDF</button>
     </form>
   )
 }

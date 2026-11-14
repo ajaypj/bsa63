@@ -1,7 +1,5 @@
-import type { Algorithm, HashMessage } from '../workers/hash.worker'
+import type { HashMessage } from '../workers/hash.worker'
 import { formatDateTimeIST } from './time'
-
-export type { Algorithm }
 
 export interface FileHash {
   name: string
@@ -9,7 +7,7 @@ export interface FileHash {
   type: string
   lastModified: string
   computedAt: string
-  hashes: Partial<Record<Algorithm, string>>
+  sha256: string
 }
 
 export interface HashJob {
@@ -17,11 +15,7 @@ export interface HashJob {
   cancel: () => void
 }
 
-export function hashFile(
-  file: File,
-  algorithms: Algorithm[],
-  onProgress: (fraction: number) => void = () => {},
-): HashJob {
+export function hashFile(file: File, onProgress: (fraction: number) => void = () => {}): HashJob {
   const worker = new Worker(new URL('../workers/hash.worker.ts', import.meta.url), { type: 'module' })
   const promise = new Promise<FileHash>((resolve, reject) => {
     worker.onmessage = (e: MessageEvent<HashMessage>) => {
@@ -41,14 +35,14 @@ export function hashFile(
         type: file.type || 'unknown',
         lastModified: formatDateTimeIST(new Date(file.lastModified)),
         computedAt: formatDateTimeIST(new Date()),
-        hashes: msg.hashes,
+        sha256: msg.sha256,
       })
     }
     worker.onerror = (e) => {
       worker.terminate()
       reject(new Error(e.message))
     }
-    worker.postMessage({ file, algorithms })
+    worker.postMessage({ file })
   })
   return { promise, cancel: () => worker.terminate() }
 }

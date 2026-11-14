@@ -2,10 +2,8 @@ import { useRef, useState } from 'react'
 import { FileDrop } from '../components/FileDrop'
 import { HashResult } from '../components/HashResult'
 import { download } from '../lib/download'
-import { hashFile, type Algorithm, type FileHash, type HashJob } from '../lib/hashFile'
-import { buildHashReportPdf, hashReportCsv, hashReportJson } from '../lib/hashReport'
-
-const OPTIONAL_ALGORITHMS: Algorithm[] = ['sha1', 'md5']
+import { hashFile, type FileHash, type HashJob } from '../lib/hashFile'
+import { buildHashReportPdf } from '../lib/hashReport'
 
 interface Props {
   results: FileHash[]
@@ -13,20 +11,20 @@ interface Props {
 }
 
 export function HashPage({ results, setResults }: Props) {
-  const [optional, setOptional] = useState<Algorithm[]>([])
   const [progress, setProgress] = useState<number | null>(null)
   const [error, setError] = useState('')
   const [expected, setExpected] = useState('')
+  const [verdict, setVerdict] = useState<{ ok: boolean; text: string } | null>(null)
   const job = useRef<HashJob | null>(null)
 
   async function run(files: File[]) {
-    const algorithms: Algorithm[] = ['sha256', ...optional]
     setError('')
+    setVerdict(null)
     const out: FileHash[] = []
     try {
       for (const file of files) {
         setProgress(0)
-        job.current = hashFile(file, algorithms, setProgress)
+        job.current = hashFile(file, setProgress)
         out.push(await job.current.promise)
       }
       setResults([...results, ...out])
@@ -44,57 +42,65 @@ export function HashPage({ results, setResults }: Props) {
     setProgress(null)
   }
 
+  /** Replace the list after a removal; reset the verify box once no files remain. */
+  function update(next: FileHash[]) {
+    setResults(next)
+    setVerdict(null)
+    if (next.length === 0) setExpected('')
+  }
+
+  function verify() {
+    const wanted = expected.trim().toLowerCase()
+    const hit = results.find((r) => r.sha256 === wanted)
+    setVerdict(hit ? { ok: true, text: `Match: ${hit.name}` } : { ok: false, text: 'No match with any hashed file' })
+  }
+
   return (
-    <div className="space-y-4">
-      <p className="rounded bg-emerald-50 p-2 text-sm">Files are processed on your device and never uploaded.</p>
-      <div className="flex gap-4 text-sm">
-        <span>SHA-256 (always)</span>
-        {OPTIONAL_ALGORITHMS.map((a) => (
-          <label key={a}>
-            <input
-              type="checkbox"
-              checked={optional.includes(a)}
-              onChange={(e) => setOptional(e.target.checked ? [...optional, a] : optional.filter((x) => x !== a))}
-            />{' '}
-            {a.toUpperCase()}
-          </label>
-        ))}
-      </div>
+    <div className="space-y-5">
       <FileDrop onFiles={run} />
       {progress !== null && (
-        <div className="flex items-center gap-2">
-          <progress className="flex-1" value={progress} max={1} />
-          <button className="rounded border px-2" onClick={cancel}>
+        <div className="card flex items-center gap-3">
+          <progress className="h-2 flex-1 accent-indigo-600" value={progress} max={1} />
+          <button className="btn-ghost" onClick={cancel}>
             Cancel
           </button>
         </div>
       )}
-      {error && <p className="text-red-700">{error}</p>}
-      <input
-        className="w-full rounded border p-2 text-sm"
-        placeholder="Verify: paste expected hash"
-        value={expected}
-        onChange={(e) => setExpected(e.target.value)}
+      {error && <p className="text-sm text-red-700">{error}</p>}
+      <HashResult
+        results={results}
+        onRemove={(i) => update(results.filter((_, idx) => idx !== i))}
       />
-      <HashResult results={results} expected={expected} />
       {results.length > 0 && (
-        <div className="flex flex-wrap gap-2 text-sm">
-          <button
-            className="rounded bg-slate-800 px-3 py-1 text-white"
-            onClick={async () => download(await buildHashReportPdf(results), 'hash-report.pdf', 'application/pdf')}
-          >
-            Hash report PDF
-          </button>
-          <button className="rounded border px-3 py-1" onClick={() => download(hashReportCsv(results), 'hash-report.csv', 'text/csv')}>
-            CSV
-          </button>
-          <button className="rounded border px-3 py-1" onClick={() => download(hashReportJson(results), 'hash-report.json', 'application/json')}>
-            JSON
-          </button>
-          <button className="rounded border px-3 py-1" onClick={() => setResults([])}>
-            Clear
-          </button>
-        </div>
+        <>
+          <div className="card space-y-3">
+            <div className="font-medium">Verify hash</div>
+            <input
+              className="field font-mono"
+              placeholder="Paste the expected SHA-256 hash"
+              value={expected}
+              onChange={(e) => {
+                setExpected(e.target.value)
+                setVerdict(null)
+              }}
+            />
+            <button className="btn-primary" disabled={!expected.trim()} onClick={verify}>
+              Verify
+            </button>
+            {verdict && <p className={`text-sm font-medium ${verdict.ok ? 'text-emerald-700' : 'text-red-700'}`}>{verdict.text}</p>}
+          </div>
+          <div className="flex gap-2">
+            <button
+              className="btn-primary"
+              onClick={async () => download(await buildHashReportPdf(results), 'hash-report.pdf', 'application/pdf')}
+            >
+              Download Report
+            </button>
+            <button className="btn-ghost" onClick={() => update([])}>
+              Clear
+            </button>
+          </div>
+        </>
       )}
     </div>
   )

@@ -113,7 +113,7 @@ function hashBlock(w: Writer, p: PartA | PartB | null, files: FileHash[]) {
   w.para(`${T.HASH_STATEMENT_PREFIX} ${files.length === 0 ? BLANK : 'as listed below,'} ${T.HASH_STATEMENT_SUFFIX}`)
   for (const f of files) {
     w.para(`${f.name}`, { bold: true, indent: 12 })
-    for (const [a, h] of Object.entries(f.hashes)) w.para(`${a.toUpperCase()}: ${h}`, { indent: 24, size: 9 })
+    w.para(`SHA256: ${f.sha256}`, { indent: 24, size: 9 })
   }
   const label = (a: string) => (a === 'Other' ? a : `${a}:`)
   w.ticks(T.ALGORITHMS.map(label), (p?.algorithms ?? []).map(label))
@@ -170,8 +170,7 @@ function cover(w: Writer, docId: string, c: CaseDetails, files: FileHash[]) {
   w.para('Files covered', { bold: true })
   for (const f of files) {
     w.para(`${f.name} (${f.size} bytes)`, { indent: 12 })
-    const sha = f.hashes.sha256
-    if (sha) w.para(`SHA256: ${sha.match(/.{1,4}/g)?.join(' ')}`, { indent: 24, size: 9 })
+    w.para(`SHA256: ${f.sha256}`, { indent: 24, size: 9 })
   }
   w.gap()
   w.para('Any change to a file will change its hash value.', { size: 9 })

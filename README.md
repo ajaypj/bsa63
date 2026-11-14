@@ -1,32 +1,12 @@
-# React + TypeScript + Vite
+# Section 63 BSA Certificate Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Static React app (Vite). No backend; files are hashed on the device. See `PLAN.md`.
 
-Currently, two official plugins are available:
+## Local
+- `npm install`
+- `npm run dev` — dev server at http://localhost:5173 (uses `.env.development`; `public/_headers` is not applied)
+- `npm run build && npm run preview` — production build served at http://localhost:4173 (uses `.env.production`)
+- `npm test`, `npm run lint`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Production
+Cloudflare Pages: build command `npm run build`, output `dist`. Security headers come from `public/_headers`. Set the real domain in `.env.production` (`VITE_APP_URL`).

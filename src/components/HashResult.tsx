@@ -1,38 +1,37 @@
 import type { FileHash } from '../lib/hashFile'
+import { useToast } from './Toast'
 
-interface Props {
-  results: FileHash[]
-  expected: string
-}
+export function HashResult({ results, onRemove }: { results: FileHash[]; onRemove: (index: number) => void }) {
+  const { show, toast } = useToast()
 
-function CopyButton({ value }: { value: string }) {
+  async function copy(hash: string) {
+    try {
+      await navigator.clipboard.writeText(hash)
+      show('Copied to clipboard')
+    } catch {
+      show('Copy failed — select the hash and copy manually')
+    }
+  }
+
   return (
-    <button className="ml-2 rounded border px-1 text-xs" onClick={() => navigator.clipboard.writeText(value)}>
-      Copy
-    </button>
-  )
-}
-
-export function HashResult({ results, expected }: Props) {
-  const wanted = expected.trim().toLowerCase()
-  return (
-    <div className="space-y-4">
-      {results.map((r) => (
-        <div key={`${r.name}-${r.computedAt}`} className="rounded border p-3">
+    <div className="space-y-3">
+      {results.map((r, i) => (
+        <div key={`${r.name}-${r.computedAt}-${i}`} className="card">
           <div className="font-semibold break-all">{r.name}</div>
-          <div className="text-sm text-slate-600">
-            {r.size} bytes · {r.type} · modified {r.lastModified} · hashed {r.computedAt}
+          <code className="mt-2 block rounded-lg bg-slate-50 p-3 font-mono text-xs break-all text-slate-700">
+            {r.sha256}
+          </code>
+          <div className="mt-3 flex gap-2">
+            <button className="btn-ghost" onClick={() => copy(r.sha256)}>
+              Copy
+            </button>
+            <button className="btn-ghost text-red-700" onClick={() => onRemove(i)}>
+              Remove
+            </button>
           </div>
-          {Object.entries(r.hashes).map(([algo, hash = '']) => (
-            <div key={algo} className="mt-1 text-sm">
-              <span className="font-medium">{algo.toUpperCase()}</span>{' '}
-              <code className="break-all">{hash}</code>
-              <CopyButton value={hash} />
-              {wanted && <span className="ml-2">{hash === wanted ? '✅ match' : '❌ no match'}</span>}
-            </div>
-          ))}
         </div>
       ))}
+      {toast}
     </div>
   )
 }
